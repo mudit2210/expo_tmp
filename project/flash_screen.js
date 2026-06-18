@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   Animated,
   Dimensions,
   StatusBar,
+  Easing,
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -16,11 +17,13 @@ export default function FlashScreen({ onFinish }) {
   const taglineOpacity = useRef(new Animated.Value(0)).current;
   const taglineTranslateY = useRef(new Animated.Value(20)).current;
   const bgOpacity = useRef(new Animated.Value(1)).current;
+  const pulse = useRef(new Animated.Value(1)).current;
+  
+  const [statusText, setStatusText] = useState('Initializing...');
 
   useEffect(() => {
-    // Sequence: logo pops in → tagline fades in → whole screen fades out
-    Animated.sequence([
-      // Logo scale + fade in
+    // 1. Initial entry animation
+    const entryAnimation = Animated.sequence([
       Animated.parallel([
         Animated.spring(logoScale, {
           toValue: 1,
@@ -34,7 +37,6 @@ export default function FlashScreen({ onFinish }) {
           useNativeDriver: true,
         }),
       ]),
-      // Tagline slides up + fades in
       Animated.parallel([
         Animated.timing(taglineOpacity, {
           toValue: 1,
@@ -47,16 +49,61 @@ export default function FlashScreen({ onFinish }) {
           useNativeDriver: true,
         }),
       ]),
-      // Hold for 1 second
-      Animated.delay(1000),
-      // Fade out entire screen
+    ]);
+
+    // 2. Continuous pulse animation
+    const pulseAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, {
+          toValue: 1.05,
+          duration: 800,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 800,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    // Start entry animation
+    entryAnimation.start(() => {
+      // Start pulse after entry
+      pulseAnimation.start();
+    });
+
+    // 3. Simulated/Real API Loading
+    const loadApis = async () => {
+      try {
+        setStatusText('Connecting to services...');
+        // Actually fetch the URL to "load all apis"
+        await fetch('https://tmp.geotree.io/');
+        setStatusText('Finalizing...');
+      } catch (e) {
+        console.warn('API load error', e);
+        setStatusText('Ready');
+      }
+    };
+
+    // Wait for BOTH the API to load AND a minimum display time of 2.5 seconds
+    Promise.all([
+      loadApis(),
+      new Promise(resolve => setTimeout(resolve, 2500)),
+    ]).then(() => {
+      setStatusText('Welcome');
+      
+      // 4. Exit animation
       Animated.timing(bgOpacity, {
         toValue: 0,
-        duration: 600,
+        duration: 800,
+        easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
-      }),
-    ]).start(() => {
-      if (onFinish) onFinish();
+      }).start(() => {
+        if (onFinish) onFinish();
+      });
     });
   }, []);
 
@@ -67,23 +114,27 @@ export default function FlashScreen({ onFinish }) {
       {/* Background circles for depth */}
       <View style={styles.circle1} />
       <View style={styles.circle2} />
+      <View style={styles.circle3} />
 
       {/* Logo area */}
       <Animated.View
         style={[
           styles.logoContainer,
           {
-            transform: [{ scale: logoScale }],
+            transform: [
+              { scale: logoScale },
+              { scale: pulse } // combine initial scale with pulse
+            ],
             opacity: logoOpacity,
           },
         ]}
       >
         <View style={styles.logoBox}>
-          <Text style={styles.logoIcon}>✦</Text>
+          <Text style={styles.logoIcon}>🌐</Text>
         </View>
-        <Text style={styles.appName}>MyApp</Text>
+        <Text style={styles.appName}>GeoField</Text>
       </Animated.View>
-
+      
       {/* Tagline */}
       <Animated.Text
         style={[
@@ -94,12 +145,12 @@ export default function FlashScreen({ onFinish }) {
           },
         ]}
       >
-        Welcome to something amazing
+        {statusText}
       </Animated.Text>
 
       {/* Bottom branding */}
       <Animated.Text style={[styles.footer, { opacity: taglineOpacity }]}>
-        Powered by your team 🚀
+        Loading required resources
       </Animated.Text>
     </Animated.View>
   );
@@ -136,6 +187,16 @@ const styles = StyleSheet.create({
     bottom: -60,
     left: -60,
   },
+  circle3: {
+    position: 'absolute',
+    width: 400,
+    height: 400,
+    borderRadius: 200,
+    backgroundColor: '#3b0764',
+    opacity: 0.15,
+    top: '40%',
+    left: -150,
+  },
   logoContainer: {
     alignItems: 'center',
     marginBottom: 24,
@@ -150,9 +211,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     shadowColor: '#a855f7',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 16,
+    shadowOpacity: 0.8,
+    shadowRadius: 24,
+    elevation: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   logoIcon: {
     fontSize: 48,
@@ -163,18 +226,23 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#ffffff',
     letterSpacing: 2,
+    textShadowColor: 'rgba(124, 58, 237, 0.5)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 10,
   },
   tagline: {
-    fontSize: 16,
-    color: '#c4b5fd',
+    fontSize: 18,
+    color: '#e2e8f0',
     letterSpacing: 0.5,
-    marginTop: 8,
+    marginTop: 12,
+    fontWeight: '500',
   },
   footer: {
     position: 'absolute',
     bottom: 48,
     fontSize: 13,
-    color: '#6d28d9',
-    letterSpacing: 0.3,
+    color: '#8b5cf6',
+    letterSpacing: 0.5,
+    fontWeight: '400',
   },
 });
