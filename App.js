@@ -1,25 +1,37 @@
 import React, { useState } from 'react';
-import { StyleSheet, SafeAreaView, StatusBar } from 'react-native';
+import { StyleSheet, StatusBar } from 'react-native';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import FlashScreen from './project/flash_screen';
+
+// --- CHOOSE YOUR WEB ENVIRONMENT ---
+
+// Option A: Local Development (Uncomment this and comment out Option B)
+// Note: Replace with your computer's local IP address and Vite server port (default 5173) to test local changes on a physical device.
+// const WEB_URL = 'http://192.168.1.49:5173/'; // Or 'http://192.168.X.X:5173/' http://localhost:5173 
+
+// Option B: Production (Default)
+const WEB_URL = 'https://tmp.geotree.io/';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
 
-  if (showSplash) {
-    return <FlashScreen onFinish={() => setShowSplash(false)} />;
-  }
-
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <WebView 
-        source={{ uri: 'https://tmp.geotree.io/' }}
-        style={styles.webview}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-      />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      {showSplash ? (
+        <FlashScreen onFinish={() => setShowSplash(false)} />
+      ) : (
+        <SafeAreaView style={styles.container}>
+          <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+          <WebView 
+            source={{ uri: WEB_URL }}
+            style={styles.webview}
+            javaScriptEnabled={true}
+            domStorageEnabled={true}
+          />
+        </SafeAreaView>
+      )}
+    </SafeAreaProvider>
   );
 }
 
