@@ -7,6 +7,7 @@ import {
   Dimensions,
   StatusBar,
   Easing,
+  Image,
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -109,7 +110,7 @@ export default function FlashScreen({ onFinish }) {
 
   return (
     <Animated.View style={[styles.container, { opacity: bgOpacity }]}>
-      <StatusBar barStyle="light-content" backgroundColor="#1a0533" />
+      <StatusBar barStyle="light-content" backgroundColor="#0a2f2b" />
 
       {/* Background circles for depth */}
       <View style={styles.circle1} />
@@ -129,10 +130,11 @@ export default function FlashScreen({ onFinish }) {
           },
         ]}
       >
-        <View style={styles.logoBox}>
-          <Text style={styles.logoIcon}>🌐</Text>
-        </View>
-        <Text style={styles.appName}>GeoField</Text>
+        <Image
+          source={require('../assets/icon.png')}
+          style={styles.logoImage}
+        />
+        {/* <Text style={styles.appName}>TrainGeo</Text> */}
       </Animated.View>
       
       {/* Tagline */}
@@ -159,7 +161,7 @@ export default function FlashScreen({ onFinish }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a0533',
+    backgroundColor: '#0a2f2b',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
@@ -172,8 +174,8 @@ const styles = StyleSheet.create({
     width: 350,
     height: 350,
     borderRadius: 175,
-    backgroundColor: '#4c1d95',
-    opacity: 0.3,
+    backgroundColor: '#14b8a6',
+    opacity: 0.15,
     top: -80,
     right: -80,
   },
@@ -182,8 +184,8 @@ const styles = StyleSheet.create({
     width: 280,
     height: 280,
     borderRadius: 140,
-    backgroundColor: '#7c3aed',
-    opacity: 0.2,
+    backgroundColor: '#6366f1',
+    opacity: 0.12,
     bottom: -60,
     left: -60,
   },
@@ -192,8 +194,8 @@ const styles = StyleSheet.create({
     width: 400,
     height: 400,
     borderRadius: 200,
-    backgroundColor: '#3b0764',
-    opacity: 0.15,
+    backgroundColor: '#10b981',
+    opacity: 0.1,
     top: '40%',
     left: -150,
   },
@@ -201,32 +203,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-  logoBox: {
-    width: 100,
-    height: 100,
+  logoImage: {
+    width: 110,
+    height: 110,
     borderRadius: 28,
-    backgroundColor: '#7c3aed',
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 20,
-    shadowColor: '#a855f7',
+    shadowColor: '#14b8a6',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.8,
-    shadowRadius: 24,
-    elevation: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  logoIcon: {
-    fontSize: 48,
-    color: '#fff',
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
   },
   appName: {
     fontSize: 42,
     fontWeight: '800',
     color: '#ffffff',
     letterSpacing: 2,
-    textShadowColor: 'rgba(124, 58, 237, 0.5)',
+    textShadowColor: 'rgba(20, 184, 166, 0.5)',
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 10,
   },
@@ -241,7 +233,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 48,
     fontSize: 13,
-    color: '#8b5cf6',
+    color: '#2dd4bf',
     letterSpacing: 0.5,
     fontWeight: '400',
   },

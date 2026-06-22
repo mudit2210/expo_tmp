@@ -14,7 +14,7 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <WebView 
-        source={{ uri: 'https://tmp.geotree.io/' }} 
+        source={{ uri: 'https://tmp.geotree.io/' }}
         style={styles.webview}
         javaScriptEnabled={true}
         domStorageEnabled={true}
