@@ -12,15 +12,32 @@ import {
 
 const { width, height } = Dimensions.get('window');
 
-export default function FlashScreen({ onFinish }) {
+export default function FlashScreen({ onFinish, isReadyToUnmount = true }) {
   const logoScale = useRef(new Animated.Value(0)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const taglineOpacity = useRef(new Animated.Value(0)).current;
   const taglineTranslateY = useRef(new Animated.Value(20)).current;
   const bgOpacity = useRef(new Animated.Value(1)).current;
   const pulse = useRef(new Animated.Value(1)).current;
+  const exitingRef = useRef(false);
   
   const [statusText, setStatusText] = useState('Initializing...');
+  const [internalReady, setInternalReady] = useState(false);
+
+  useEffect(() => {
+    if (internalReady && isReadyToUnmount && !exitingRef.current) {
+      exitingRef.current = true;
+      // 4. Exit animation
+      Animated.timing(bgOpacity, {
+        toValue: 0,
+        duration: 800,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
+      }).start(() => {
+        if (onFinish) onFinish();
+      });
+    }
+  }, [internalReady, isReadyToUnmount, bgOpacity, onFinish]);
 
   useEffect(() => {
     // 1. Initial entry animation
@@ -95,16 +112,7 @@ export default function FlashScreen({ onFinish }) {
       new Promise(resolve => setTimeout(resolve, 2500)),
     ]).then(() => {
       setStatusText('Welcome');
-      
-      // 4. Exit animation
-      Animated.timing(bgOpacity, {
-        toValue: 0,
-        duration: 800,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: true,
-      }).start(() => {
-        if (onFinish) onFinish();
-      });
+      setInternalReady(true);
     });
   }, []);
 
