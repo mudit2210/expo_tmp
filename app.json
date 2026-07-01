@@ -4,32 +4,82 @@
     "slug": "traingeo",
     "version": "1.0.0",
     "orientation": "portrait",
+
     "icon": "./assets/icon.png",
+
+    "scheme": "traingeo",
+
+    "userInterfaceStyle": "light",
+
     "splash": {
       "image": "./assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "userInterfaceStyle": "light",
-    "ios": {
-      "supportsTablet": true
+
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+
+    "runtimeVersion": {
+      "policy": "appVersion"
     },
+
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.app.gpspl.traingeo",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow TrainGeo to access your camera to capture photos for events.",
+        "NSLocationWhenInUseUsageDescription": "Allow TrainGeo to access your location to verify your presence at training venues.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow TrainGeo to access your location to verify your presence at training venues."
+      }
+    },
+
     "android": {
+      "package": "com.app.gpspl.traingeo",
+      "versionCode": 1,
+
       "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
+        "backgroundColor": "#FFFFFF",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.app.gpspl.traingeo"
+
+      "permissions": [
+        "CAMERA",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
+
     "web": {
       "favicon": "./assets/favicon.png"
     },
+
     "extra": {
       "eas": {
         "projectId": "150d25b0-baa8-4f7a-aed5-58a6c2b7757b"
       }
-    }
+    },
+
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow TrainGeo to access your camera to capture photos for events."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow TrainGeo to access your location to verify your presence at training venues."
+        }
+      ]
+    ]
   }
 }
