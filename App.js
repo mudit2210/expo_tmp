@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, StatusBar, View } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { StyleSheet, StatusBar, View, AppState } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import FlashScreen from './project/flash_screen';
@@ -16,16 +16,33 @@ const WEB_URL = 'https://tmp.geotree.io/';
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [webViewLoaded, setWebViewLoaded] = useState(false);
+  const webViewRef = useRef(null);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (nextAppState === 'active') {
+        webViewRef.current?.reload();
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
         <WebView 
+          ref={webViewRef}
           source={{ uri: WEB_URL }}
           style={styles.webview}
           javaScriptEnabled={true}
           domStorageEnabled={true}
+          cacheEnabled={false}
+          sharedCookiesEnabled={true}
+          thirdPartyCookiesEnabled={true}
           onLoadEnd={() => setWebViewLoaded(true)}
         />
       </SafeAreaView>
